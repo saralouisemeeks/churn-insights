@@ -109,7 +109,7 @@ with tab_accounts:
             "tenure_months", "csm", "health_score", "status",
             "crm_churn_reason", "note_count",
         ]].sort_values("arr", ascending=False),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config={
             "arr": st.column_config.NumberColumn("ARR", format="$%d"),

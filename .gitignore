@@ -16,3 +16,6 @@ __pycache__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Streamlit agent skills (environment-specific symlinks)
+.agents/
