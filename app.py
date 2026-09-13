@@ -52,9 +52,21 @@ with st.sidebar:
         default=sorted(accounts["status"].unique()),
     )
     csms = st.multiselect("CSM", sorted(accounts["csm"].unique()), default=[])
+    health_range = st.slider(
+        "CRM health score",
+        min_value=0,
+        max_value=100,
+        value=(0, 100),
+        help=(
+            "The CRM's own score. Set this to 65-100 with status 'churned' to "
+            "isolate the accounts the CRM called healthy and lost anyway."
+        ),
+    )
 
 view = accounts[
-    accounts["segment"].isin(segments) & accounts["status"].isin(statuses)
+    accounts["segment"].isin(segments)
+    & accounts["status"].isin(statuses)
+    & accounts["health_score"].between(health_range[0], health_range[1])
 ]
 if csms:
     view = view[view["csm"].isin(csms)]
