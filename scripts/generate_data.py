@@ -312,13 +312,26 @@ def build_accounts():
             renewal = TODAY + timedelta(days=months_to_renewal * 30)
             crm_reason = ""
 
-        # Health score is deliberately poorly calibrated.
+        # Health score is deliberately poorly calibrated. The two distributions
+        # overlap heavily on purpose: if churned and retained accounts drew from
+        # disjoint ranges, the score would be a hidden label rather than a
+        # realistically mediocre metric, and the whole project would be circular.
         if churned:
-            health = random.randint(58, 92) if random.random() < 0.40 else random.randint(22, 64)
+            health = int(random.triangular(22, 96, 62))
         else:
-            health = random.randint(45, 98)
+            health = int(random.triangular(26, 98, 70))
 
-        active_seats = max(1, int(seats * random.uniform(0.15, 1.0)))
+        # Adoption carries some real signal, but nowhere near enough to act on.
+        if churned:
+            active_seats = max(1, int(seats * random.uniform(0.10, 0.88)))
+        else:
+            active_seats = max(1, int(seats * random.uniform(0.16, 1.0)))
+
+        # Tenure is lifetime as a customer, so it ends at churn rather than
+        # today. Measuring churned accounts to the present date would inflate
+        # their tenure and deflate any per-month rate computed from it.
+        end = churn_date or TODAY
+        lifetime_months = max(1, round((end - start).days / 30))
 
         accounts.append({
             "account_id": f"ACC-{1000 + i}",
@@ -330,7 +343,7 @@ def build_accounts():
             "seats_active": active_seats,
             "contract_start_date": start.isoformat(),
             "renewal_date": renewal.isoformat(),
-            "tenure_months": tenure,
+            "tenure_months": lifetime_months,
             "csm": random.choice(CSM_NAMES),
             "health_score": health,
             "status": status,
