@@ -1,0 +1,7 @@
+# The chart palette is validated against a light surface, so the app pins the
+# light theme rather than rendering differently for each viewer.
+[theme]
+base = "light"
+
+[browser]
+gatherUsageStats = false
